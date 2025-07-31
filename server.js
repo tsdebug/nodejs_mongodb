@@ -11,7 +11,7 @@ app.use(bodyParser.json()); // req.body
 const PORT = process.env.PORT || 3000; 
 
 app.get('/', function (req, res){
-    res.sent('Welcome to my hotel...');
+    res.send('Welcome to my hotel...');
 })
 
 // Import the router files
