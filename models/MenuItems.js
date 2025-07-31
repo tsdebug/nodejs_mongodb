@@ -32,6 +32,6 @@ const menuItemSchema = new mongoose.Schema({
 })
 
 // Create a model 
-const MenuItem = mongoose.model('MenuItem', menuItemSchema);
+const MenuItem = mongoose.model('MenuItem', menuItemSchema); // name of the collection is determined by the model name
 
 module.exports = MenuItem;
