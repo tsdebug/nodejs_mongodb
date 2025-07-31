@@ -19,8 +19,8 @@ const personRouters = require('./routes/personRoutes');
 const menuItemRouters = require('./routes/menuItemRoutes');
 
 // Use the routers
-app.use('/', personRouters);
-app.use('/', menuItemRouters);
+app.use('/person', personRouters);
+app.use('/menu', menuItemRouters);
 
 app.listen(3000, ()=>{
     console.log('Listening on port 3000');
