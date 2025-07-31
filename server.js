@@ -2,11 +2,13 @@ const express = require('express');
 const app = express();
 
 const db = require('./db'); // export the db connection
-
+require('dotenv').config();
 
 // To parse data between server and client
 const bodyParser = require('body-parser');
 app.use(bodyParser.json()); // req.body
+
+const PORT = process.env.PORT || 3000; 
 
 app.get('/', function (req, res){
     res.sent('Welcome to my hotel...');
