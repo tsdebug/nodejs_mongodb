@@ -3,7 +3,7 @@ const router = express.Router();
 const MenuItem = require('./../models/MenuItems'); // Import the Person schema
 
 // POST Method to add a Menu Item
-router.post('/menu', async(req, res) =>{
+router.post('/', async(req, res) =>{
     try{
         const data = req.body;
         const newMenu = new MenuItem(data);
@@ -19,7 +19,7 @@ router.post('/menu', async(req, res) =>{
 })
 
 // GET methode to get/fetch the Menu Items
-router.get('/menu', async(req, res) =>{
+router.get('/', async(req, res) =>{
     try{
         const data = await MenuItem.find();
         console.log('Data Fetched !');
@@ -27,7 +27,7 @@ router.get('/menu', async(req, res) =>{
     }
 
     catch{
-        console.loglog(err);
+        console.log(err);
         res.status(500).json({error: 'Internal Server Error'});
     }
 })
