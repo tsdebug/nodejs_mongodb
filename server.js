@@ -22,6 +22,6 @@ const menuItemRouters = require('./routes/menuItemRoutes');
 app.use('/person', personRouters);
 app.use('/menu', menuItemRouters);
 
-app.listen(3000, ()=>{
-    console.log('Listening on port 3000');
+app.listen(PORT, ()=>{
+    console.log(`Listening on port ${PORT}`);
 })
