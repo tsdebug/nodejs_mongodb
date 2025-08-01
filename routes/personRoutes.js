@@ -4,7 +4,7 @@ const route = express.Router();
 const Person = require('./../models/person'); // Import the Person schema
 
 // POST route to add a person -  Async await method
-route.post('/person', async (req, res) => {
+route.post('/', async (req, res) => {
     try {
         const data = req.body // Assuming the request body contains the person data
 
@@ -23,7 +23,7 @@ route.post('/person', async (req, res) => {
 })
 
 // GET method to get the person
-route.get('/person', async (req, res) => {
+route.get('/', async (req, res) => {
     try {
         const data = await Person.find();
         console.log('Data fetched');
@@ -36,7 +36,7 @@ route.get('/person', async (req, res) => {
 })
 
 // Parametrised API calls for Person on the basis og workType
-route.get('/person/:workType', async (req, res) => {
+route.get('/:workType', async (req, res) => {
     try {
         const workType = req.params.workType; // Extract the work type from thr URL parameter
         if (workType == 'Chef' || workType == 'Manager' || workType == 'Waiter') {
@@ -56,7 +56,7 @@ route.get('/person/:workType', async (req, res) => {
 })
 
 // PUT method to update person data
-route.put('/person/:id', async (req, res) => {
+route.put('/:id', async (req, res) => {
     try {
         const personId = req.params.id; // Extract the id from the URL parameters
         const updatedPersonData = req.body; // Updated data for the person
@@ -81,7 +81,7 @@ route.put('/person/:id', async (req, res) => {
 
 
 // DELETE methode to delete person recode
-route.delete('/person/:id', async(req, res) => {
+route.delete('/:id', async(req, res) => {
     try{
         const personId = req.params.id; // Extract the id from the URL parameters
 
