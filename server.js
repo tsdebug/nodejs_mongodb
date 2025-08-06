@@ -1,41 +1,42 @@
 const express = require('express');
 const app = express();
-
-const db = require('./db'); // export the db connection
+const db = require('./db');
 require('dotenv').config();
 
-// Passpost.js
+// Passport.js configuration
 const passport = require('./auth');
 
-// To parse data between server and client
+// Middleware to parse JSON body
 const bodyParser = require('body-parser');
-app.use(bodyParser.json()); // req.body
+app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3000;
 
-// Middleware function
-const logRequest = (req, res, next) =>{
+// Middleware function to log requests
+const logRequest = (req, res, next) => {
     console.log(`[${new Date().toLocaleString()}] Request Made To: ${req.originalUrl}`);
-    next(); // Move on to the next phase - very important
+    next(); // Move on to the next phase
 }
-app.use(logRequest); // It's out here instead of with anyone endpoint is so that it's available from all the endpoints
+app.use(logRequest);
 
-
+// Initialize Passport
 app.use(passport.initialize());
 
-const localMiddleware = passport.authenticate('local', {session: false});
-app.get('/', function (req, res){
+// Default welcome route
+app.get('/', function (req, res) {
     res.send('Welcome to my hotel...');
-})
+});
 
 // Import the router files
 const personRouters = require('./routes/personRoutes');
 const menuItemRouters = require('./routes/menuItemRoutes');
 
 // Use the routers
-app.use('/person', localMiddleware, personRouters);
+// The authentication middleware is no longer applied globally here.
+// It will be applied to specific routes inside personRoutes.js.
+app.use('/person', personRouters);
 app.use('/menu', menuItemRouters);
 
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
-})
+});

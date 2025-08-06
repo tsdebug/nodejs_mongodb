@@ -1,33 +1,36 @@
-// Passpost.js
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy; // Passpost-local:This is a username & Password strategy of authenticating users
+const LocalStrategy = require('passport-local').Strategy; 
 
-const Person = require('./models/person');
+const Person = require('./models/Person');
 
-// Verification function
-passport.use(new LocalStrategy(async(USERNAME, password, done)=>{  // done callback should always be the last parameter
-    // authentication logic here
-    try{
-        console.log('Received credencials:', USERNAME, password);
-        const user = await Person.findOne({username: USERNAME});
+// Verification function for Passport's Local Strategy
+passport.use(new LocalStrategy(async (username, password, done) => {
+    try {
+        // Find the user by username
+        const user = await Person.findOne({ username: username });
 
-        // If authentication fails: done(null, false, {message: 'some message'})
-        if(!user)
-            return done(null, false, {message: 'Incorrect username'});    // Done takes three parameters: done(error, user, info)
+        // If the user is not found
+        if (!user) {
+            return done(null, false, { message: 'Incorrect username.' });
+        }
 
+        // Compare the provided password with the stored hashed password
         const isPasswordMatch = await user.comparePassword(password);
 
-        if(isPasswordMatch){
+        if (isPasswordMatch) {
+            // If the password matches, authentication is successful
             return done(null, user);
         } 
-        else{
-            return done(null, false, {message: 'Incorrect password.'});
+        else {
+            // If the password does not match
+            return done(null, false, { message: 'Incorrect password.' });
         }
-        // If authentication successful: done(null, user)
-    }
-    catch(err){
+    } 
+    catch (err) {
+        // If there's an error during the process
         return done(err);
     }
 }));
 
-module.exports = passport; // Export configured passport
+// Export the configured passport
+module.exports = passport;
