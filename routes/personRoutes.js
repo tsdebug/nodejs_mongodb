@@ -1,7 +1,11 @@
 const express = require('express');
 const route = express.Router();
 const Person = require('../models/Person');
+
 const passport = require('../auth'); // Import passport for middleware
+
+const {jwtAuthMiddleware, generateToken} = require('./../jwt');
+
 
 // Define the local authentication middleware for protecting routes
 const localAuthMiddleware = passport.authenticate('local', { session: false });
@@ -11,26 +15,88 @@ const localAuthMiddleware = passport.authenticate('local', { session: false });
 // POST route to add a person (Sign Up)
 route.post('/signup', async (req, res) => {
     try {
-        const data = req.body;
+        const data = req.body;  // Assuming the request body contains the person data
+
+        // Create a new Person doc using the Mongoose model
         const newPerson = new Person(data);
+
+        // Save the new Person to the database
         const response = await newPerson.save();
-        console.log('User Registered!');
-        res.status(200).json({ message: 'User registered successfully', user: response });
-    } catch (err) {
+        console.log('User Registered - Data saved!');
+
+        const payload = {
+            id: response.id,
+            username: response.username
+        }
+
+        console.log(JSON.stringify(payload));
+        const token = generateToken(payload);
+        console.log("Token is : ", token);
+        
+        res.status(200).json({ message: 'User registered successfully', response: response, token: token});
+    } 
+    catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
+// Login Route
+route.post('/login', async(req, res) =>{
+    try{
+        // Extract username and password from request body
+        const {username, password} = req.body;
+
+        // Find the user by username
+        const user = await Person.findOne({username: username});
+
+        // If user does not exist or password does not match, return error
+        if( !user || !(await user.comparePassword(password))){
+            return res.status(401).json({error: 'Invalid username or password'});
+        }
+
+        // generate Token 
+        const payload = {
+            id: user.id,
+            username: user.username
+        }
+        const token = generateToken(payload);
+
+        // resturn token as response
+        res.json({token})
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Profile route
+route.get('/profile', jwtAuthMiddleware, async (req, res) => {
+    try{
+        const userData = req.user;
+        console.log("User Data: ", userData);
+
+        const userId = userData.id;
+        const user = await Person.findById(userId);
+
+        res.status(200).json({user});
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
 // PROTECTED ROUTES - AUTHENTICATION REQUIRED **
  
 
 // GET method to get all persons
-route.get('/', localAuthMiddleware, async (req, res) => {
+route.get('/', jwtAuthMiddleware, async (req, res) => {
     try {
         const data = await Person.find();
         console.log('Data fetched');
-        res.status(200).json(data);
+        res.status(200).json(data); 
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -38,7 +104,7 @@ route.get('/', localAuthMiddleware, async (req, res) => {
 });
 
 // GET method for specific work types
-route.get('/:workType', localAuthMiddleware, async (req, res) => {
+route.get('/:workType', async (req, res) => {
     try {
         const workType = req.params.workType;
         const validTypes = ['Chef', 'Waiter', 'Manager'];
@@ -56,7 +122,7 @@ route.get('/:workType', localAuthMiddleware, async (req, res) => {
 });
 
 // PUT method to update person data
-route.put('/:id', localAuthMiddleware, async (req, res) => {
+route.put('/:id', async (req, res) => {
     try {
         const personId = req.params.id;
         const updatedPersonData = req.body;
@@ -79,7 +145,7 @@ route.put('/:id', localAuthMiddleware, async (req, res) => {
 });
 
 // DELETE method to delete a person's record
-route.delete('/:id', localAuthMiddleware, async (req, res) => {
+route.delete('/:id', async (req, res) => {
     try {
         const personId = req.params.id;
         const response = await Person.findByIdAndDelete(personId);
