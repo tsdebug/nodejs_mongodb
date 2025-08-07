@@ -1,6 +1,6 @@
 const express = require('express');
 const route = express.Router();
-const Person = require('../models/Person');
+const Person = require('./../models/Person');
 
 const passport = require('../auth'); // Import passport for middleware
 
