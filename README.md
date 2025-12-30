@@ -54,4 +54,4 @@ Since this connects to a database, you will need your own connection string.
 5.  Open `localhost:3000` in your browser to see the application running.
 
 ---
-*Based on the Net Ninja Node.js Curriculum.*
+
